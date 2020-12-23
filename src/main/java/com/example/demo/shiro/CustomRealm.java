@@ -1,13 +1,10 @@
 package com.example.demo.shiro;
 
 
-import com.example.demo.contants.Constant;
-import com.example.demo.service.PermissionService;
-import com.example.demo.service.RedisService;
-import com.example.demo.service.RoleService;
-import com.example.demo.utils.JwtTokenUtil;
-import io.jsonwebtoken.Claims;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -18,9 +15,14 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import com.example.demo.contants.Constant;
+import com.example.demo.service.PermissionService;
+import com.example.demo.service.RedisService;
+import com.example.demo.service.RoleService;
+import com.example.demo.utils.JwtTokenUtil;
+
+import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CustomRealm extends AuthorizingRealm {
@@ -51,7 +53,6 @@ public class CustomRealm extends AuthorizingRealm {
             if(permissionByUserId!=null&&!permissionByUserId.isEmpty()){
                 info.addStringPermissions(permissionByUserId);
             }
-
         }else {
             if(claimsFromToken.get(Constant.PERMISSIONS_INFOS_KEY)!=null){
                 info.addStringPermissions((Collection<String>) claimsFromToken.get(Constant.PERMISSIONS_INFOS_KEY));

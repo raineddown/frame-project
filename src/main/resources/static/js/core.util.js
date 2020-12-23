@@ -8,13 +8,13 @@ var CoreUtil = (function () {
         layui.jquery.ajax({
             url: url,
             cache: false,
-            async: async == undefined ? true : async,
+            async: async === undefined ? true : async,
             data: params,
-            type: method == undefined ? "POST" : method,
-            contentType: contentType == undefined ? 'application/json; charset=UTF-8': contentType ,
+            type: method === undefined ? "POST" : method,
+            contentType: contentType === undefined ? 'application/json; charset=UTF-8': contentType ,
             dataType: "json",
             beforeSend: function(request) {
-                if(headers == undefined){
+                if(headers === undefined){
 
                 }else if(headers){
                     request.setRequestHeader("authorization", CoreUtil.getData("access_token"));
