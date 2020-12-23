@@ -1,12 +1,5 @@
 package com.example.demo.exception.code;
 
-/**
- * @ClassName: BaseResponseCode
- * TODO:类文件简单描述
- * @Author: 小霍
- * @UpdateUser: 小霍
- * @Version: 0.0.1
- */
 public enum BaseResponseCode implements ResponseCodeInterface{
     /**
      * 这个要和前段约定好
@@ -44,6 +37,7 @@ public enum BaseResponseCode implements ResponseCodeInterface{
     NOT_PERMISSION_DELETED_DEPT(4010015,"该组织机构下还关联着用户，不允许删除"),
     OLD_PASSWORD_ERROR(4010016,"旧密码不匹配"),
     OPERATION_MENU_PERMISSION_URL_CODE_NULL(4000011,"菜单权限的按钮标识不能为空"),
+    BLOOMFILTER_NO_CONTAIN_ERRO(4000012,"布隆过滤器中未包含该数据"),
 
     ;
 

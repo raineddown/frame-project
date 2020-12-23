@@ -80,4 +80,8 @@ public class Constant {
     public static final String DEPT_CODE_KEY="dept-code-key_";
 
 
+    /*
+    *  缓存数据
+    * */
+    public static final String REDIS_CACHE_SYS_ROLE="sys_role_";
 }

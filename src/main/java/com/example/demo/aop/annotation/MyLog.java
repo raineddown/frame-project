@@ -2,13 +2,6 @@ package com.example.demo.aop.annotation;
 
 import java.lang.annotation.*;
 
-/**
- * @ClassName: MyLog
- * TODO:类文件简单描述
- * @Author: 小霍
- * @UpdateUser: 小霍
- * @Version: 0.0.1
- */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

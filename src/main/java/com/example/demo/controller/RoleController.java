@@ -1,14 +1,21 @@
 package com.example.demo.controller;
 
-
+import com.google.common.base.Charsets;
+import com.alibaba.fastjson.JSONObject;
 import com.example.demo.aop.annotation.MyLog;
+import com.example.demo.contants.Constant;
 import com.example.demo.entity.SysRole;
+import com.example.demo.exception.BusinessException;
+import com.example.demo.exception.code.BaseResponseCode;
+import com.example.demo.service.RedisService;
 import com.example.demo.service.RoleService;
 import com.example.demo.utils.DataResult;
 import com.example.demo.vo.req.AddRoleReqVO;
 import com.example.demo.vo.req.RolePageReqVO;
 import com.example.demo.vo.req.RoleUpdateReqVO;
 import com.example.demo.vo.resp.PageVO;
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnels;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -30,6 +37,29 @@ import javax.validation.Valid;
 public class RoleController {
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private RedisService redisService;
+
+    /**
+     * 布隆过滤器预计要插入多少数据
+     */
+    private static int size = 10000;
+
+    /**
+     * 布隆过滤器期望的误判率
+     */
+    private static double fpp = 0.01;
+
+    /**
+     * 布隆过滤器
+     */
+    private static BloomFilter<String> bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charsets.UTF_8), size, fpp);
+
+    private static void bloomPutData(RoleService roleService){
+        for (SysRole sysRole : roleService.selectAll()){
+            bloomFilter.put(sysRole.getId());
+        }
+    }
 
     @PostMapping("/roles")
     @ApiOperation(value = "分页获取角色数据接口")
@@ -56,8 +86,22 @@ public class RoleController {
     @MyLog(title = "组织管理-角色管理",action = "获取角色详情接口")
     @RequiresPermissions("sys:role:detail")
     public DataResult<SysRole> detailInfo(@PathVariable("id") String id){
+        bloomPutData(roleService);
+        SysRole sysRole;
+        if (bloomFilter.mightContain(id)){
+            if ( redisService.get(Constant.REDIS_CACHE_SYS_ROLE + id) == null ){
+                sysRole = roleService.detailInfo(id);
+                redisService.set(Constant.REDIS_CACHE_SYS_ROLE + id, sysRole);
+                bloomFilter.put(id);
+            }else {
+                String sysRoleJson = redisService.get(Constant.REDIS_CACHE_SYS_ROLE + id).toString();
+                sysRole = JSONObject.parseObject(sysRoleJson, SysRole.class);
+            }
+        } else {
+            throw new BusinessException(BaseResponseCode.BLOOMFILTER_NO_CONTAIN_ERRO);
+        }
         DataResult result=DataResult.success();
-        result.setData(roleService.detailInfo(id));
+        result.setData(sysRole);
         return result;
     }
 
